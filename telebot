@@ -1,0 +1,47 @@
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
+from telegram import InlineQueryResultPhoto, InputTextMessageContent
+
+# Define your bot token
+TOKEN = "YOUR_BOT_TOKEN"
+
+# Create an updater object
+updater = Updater(token=TOKEN, use_context=True)
+
+# Get the dispatcher to register handlers
+dispatcher = updater.dispatcher
+
+# Define a command handler function
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Hello! I'm your Telegram bot.")
+
+# Register the command handler
+start_handler = CommandHandler('start', start)
+dispatcher.add_handler(start_handler)
+
+# Define an inline query handler function
+def inline_query(update, context):
+    query = update.inline_query.query
+    results = [
+        InlineQueryResultPhoto(
+            id=1,
+            title='Example Photo',
+            photo_url='https://example.com/example.jpg',
+            thumb_url='https://example.com/example_thumb.jpg'
+        )
+    ]
+    context.bot.answer_inline_query(update.inline_query.id, results)
+
+# Register the inline query handler
+inline_query_handler = InlineQueryHandler(inline_query)
+dispatcher.add_handler(inline_query_handler)
+
+# Define a message handler function
+def echo(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+
+# Register the message handler
+echo_handler = MessageHandler(Filters.text & (~Filters.command), echo)
+dispatcher.add_handler(echo_handler)
+
+# Start the bot
+updater.start_polling()
